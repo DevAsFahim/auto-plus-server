@@ -12,12 +12,19 @@ app.use(express.json());
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://<username>:<password>@cluster0.3q2ltkd.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.3q2ltkd.mongodb.net/?retryWrites=true&w=majority`;
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
     try {
+        const categoriesCollection = client.db('autoPlus').collection('categories');
 
+        app.get('/categories', async(req, res) => {
+            const query = {}
+            const categories = await categoriesCollection.find(query).toArray();
+            res.send(categories)
+        })
     }
     finally{
 
