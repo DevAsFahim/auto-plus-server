@@ -20,18 +20,28 @@ async function run() {
     try {
         const categoriesCollection = client.db('autoPlus').collection('categories');
         const carsCollection = client.db('autoPlus').collection('cars');
+        const usersCollection = client.db('autoPlus').collection('users');
 
+        // get category
         app.get('/categories', async(req, res) => {
             const query = {}
             const categories = await categoriesCollection.find(query).toArray();
             res.send(categories)
         })
-        app.get('/category/:id', async(req, res) => {
+        app.get('/product/:id', async(req, res) => {
             const id = req.params.id;
             const query = { categoryId: id }
             const cars = await carsCollection.find(query).toArray();
             res.send(cars)
         })
+
+        // post user
+        app.post('/users', async(req, res) => {
+            const users = req.body;
+            const result = await usersCollection.insertOne(users);
+            res.send(result)
+        })
+
     }
     finally{
 
