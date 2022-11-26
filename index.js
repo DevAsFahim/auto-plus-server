@@ -21,6 +21,7 @@ async function run() {
         const categoriesCollection = client.db('autoPlus').collection('categories');
         const carsCollection = client.db('autoPlus').collection('cars');
         const usersCollection = client.db('autoPlus').collection('users');
+        const bookingsCollection = client.db('autoPlus').collection('bookings');
 
         // get category
         app.get('/categories', async(req, res) => {
@@ -39,6 +40,13 @@ async function run() {
         app.post('/users', async(req, res) => {
             const users = req.body;
             const result = await usersCollection.insertOne(users);
+            res.send(result)
+        })
+
+        // post user product bookings to database
+        app.post('/bookings', async(req, res) => {
+            const bookings = req.body;
+            const result = await bookingsCollection.insertOne(bookings);
             res.send(result)
         })
 
