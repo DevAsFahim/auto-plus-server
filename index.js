@@ -22,6 +22,7 @@ async function run() {
         const carsCollection = client.db('autoPlus').collection('cars');
         const usersCollection = client.db('autoPlus').collection('users');
         const bookingsCollection = client.db('autoPlus').collection('bookings');
+        const blogsCollection = client.db('autoPlus').collection('blogs');
 
         // get category
         app.get('/categories', async (req, res) => {
@@ -54,6 +55,25 @@ async function run() {
             const query = { sellerEmail: email };
             const myProducts = await carsCollection.find(query).toArray();
             res.send(myProducts)
+        })
+        // get user data
+        app.get('/advertise', async (req, res) => {
+            const query = { advertise: 'true' };
+            const result = await carsCollection.find(query).toArray();
+            res.send(result)
+        })
+        //get blog data
+        app.get('/blogs', async(req, res) => {
+            const query = {};
+            const blogs = await blogsCollection.find(query).toArray();
+            res.send(blogs)
+        })
+        // individual blog data
+        app.get('/blogs/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const blog = await blogsCollection.findOne(query);
+            res.send(blog)
         })
 
         // post car 
@@ -91,20 +111,41 @@ async function run() {
             res.send(result)
         })
 
+        // advertise true
+        app.put('/advertise/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true }
+            const updateDoc = {
+                $set: {
+                    advertise: "true"
+                },
+            }
+            const result = await carsCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
         // delete seller
-        app.delete('/seller/:id', async(req, res) => {
+        app.delete('/seller/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
             res.send(result)
-        } )
+        })
         // delete user
-        app.delete('/user/:id', async(req, res) => {
+        app.delete('/user/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
             res.send(result)
-        } )
+        })
+        // delete product
+        app.delete('/myproducts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await carsCollection.deleteOne(query);
+            res.send(result)
+        })
 
     }
     finally {
