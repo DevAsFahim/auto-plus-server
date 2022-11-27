@@ -35,6 +35,12 @@ async function run() {
             const cars = await carsCollection.find(query).toArray();
             res.send(cars)
         })
+        // get seller data
+        app.get('/sellers', async(req, res) => {
+            const query = {userType: 'seller'};
+            const sellers = await usersCollection.find(query).toArray();
+            res.send(sellers)
+        } )
 
         // post car 
         app.post('/products', async(req, res) => {
