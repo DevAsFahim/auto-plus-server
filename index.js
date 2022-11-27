@@ -1,3 +1,4 @@
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -11,7 +12,6 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.3q2ltkd.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -24,47 +24,60 @@ async function run() {
         const bookingsCollection = client.db('autoPlus').collection('bookings');
 
         // get category
-        app.get('/categories', async(req, res) => {
+        app.get('/categories', async (req, res) => {
             const query = {}
             const categories = await categoriesCollection.find(query).toArray();
             res.send(categories)
         })
-        app.get('/product/:id', async(req, res) => {
+        app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { categoryId: id }
             const cars = await carsCollection.find(query).toArray();
             res.send(cars)
         })
         // get seller data
-        app.get('/sellers', async(req, res) => {
-            const query = {userType: 'seller'};
+        app.get('/sellers', async (req, res) => {
+            const query = { userType: 'seller' };
             const sellers = await usersCollection.find(query).toArray();
             res.send(sellers)
-        } )
+        })
 
         // post car 
-        app.post('/products', async(req, res) => {
+        app.post('/products', async (req, res) => {
             const product = req.body;
             const result = await carsCollection.insertOne(product);
             res.send(result);
         })
 
         // post user
-        app.post('/users', async(req, res) => {
+        app.post('/users', async (req, res) => {
             const users = req.body;
             const result = await usersCollection.insertOne(users);
             res.send(result)
         })
 
         // post user product bookings to database
-        app.post('/bookings', async(req, res) => {
+        app.post('/bookings', async (req, res) => {
             const bookings = req.body;
             const result = await bookingsCollection.insertOne(bookings);
             res.send(result)
         })
 
+        // verify seller
+        app.put('/seller/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true }
+            const updateDoc = {
+                $set: {
+                    verified: "true"
+                },
+            }
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
     }
-    finally{
+    finally {
 
     }
 }
