@@ -48,6 +48,14 @@ async function run() {
             res.send(users)
         })
 
+        // get sellers products
+        app.get('/myproducts/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { sellerEmail: email };
+            const myProducts = await carsCollection.find(query).toArray();
+            res.send(myProducts)
+        })
+
         // post car 
         app.post('/products', async (req, res) => {
             const product = req.body;
@@ -85,6 +93,13 @@ async function run() {
 
         // delete seller
         app.delete('/seller/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result)
+        } )
+        // delete user
+        app.delete('/user/:id', async(req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
