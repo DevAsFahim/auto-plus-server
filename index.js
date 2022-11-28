@@ -44,12 +44,19 @@ async function run() {
         const usersCollection = client.db('autoPlus').collection('users');
         const bookingsCollection = client.db('autoPlus').collection('bookings');
         const blogsCollection = client.db('autoPlus').collection('blogs');
+        const testimonialsCollection = client.db('autoPlus').collection('testimonials');
 
         // get category
         app.get('/categories', async (req, res) => {
             const query = {}
             const categories = await categoriesCollection.find(query).toArray();
             res.send(categories)
+        })
+        // get testimonials
+        app.get('/testimonials', async (req, res) => {
+            const query = {}
+            const test = await testimonialsCollection.find(query).toArray();
+            res.send(test)
         })
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
@@ -108,6 +115,21 @@ async function run() {
             res.send(blog)
         })
 
+        //check admin
+        app.get('/users/admin/:email', async(req, res) => {
+            const email = req.params.email;
+            const query = { email };
+            const user = await usersCollection.findOne(query);
+            res.send({isAdmin: user?.userType === 'admin'})
+        })
+        // check seller
+        app.get('/users/seller/:email', async(req, res) => {
+            const email = req.params.email;
+            const query = { email };
+            const user = await usersCollection.findOne(query);
+            res.send({isSeller: user?.userType === 'seller'})
+        })
+
         // post car 
         app.post('/products', async (req, res) => {
             const product = req.body;
@@ -131,6 +153,14 @@ async function run() {
 
         // verify seller
         app.put('/seller/:id', async (req, res) => {
+            // const decodedEmail = req.decoded.email;
+            // const query = { email: decodedEmail };
+            // const user = await usersCollection.findOne(query);
+
+            // if(user?.userType !== 'admin'){
+            //     return res.status(403).send({message: 'forbidden access'})
+            // }
+
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true }
