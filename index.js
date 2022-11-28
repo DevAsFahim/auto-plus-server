@@ -45,6 +45,7 @@ async function run() {
         const bookingsCollection = client.db('autoPlus').collection('bookings');
         const blogsCollection = client.db('autoPlus').collection('blogs');
         const testimonialsCollection = client.db('autoPlus').collection('testimonials');
+        const wishesCollection = client.db('autoPlus').collection('wishes');
 
         // get category
         app.get('/categories', async (req, res) => {
@@ -94,6 +95,20 @@ async function run() {
             const query = { sellerEmail: email };
             const myProducts = await carsCollection.find(query).toArray();
             res.send(myProducts)
+        })
+        // get sellers products
+        app.get('/bookings/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email };
+            const bookings = await bookingsCollection.find(query).toArray();
+            res.send(bookings)
+        })
+        // get wish products
+        app.get('/wishlist/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { userEmail: email };
+            const wishes = await wishesCollection.find(query).toArray();
+            res.send(wishes)
         })
         // get user data
         app.get('/advertise', async (req, res) => {
@@ -150,17 +165,14 @@ async function run() {
             const result = await bookingsCollection.insertOne(bookings);
             res.send(result)
         })
+        app.post('/wishlist', async (req, res) => {
+            const wishes = req.body;
+            const result = await wishesCollection.insertOne(wishes);
+            res.send(result)
+        })
 
         // verify seller
         app.put('/seller/:id', async (req, res) => {
-            // const decodedEmail = req.decoded.email;
-            // const query = { email: decodedEmail };
-            // const user = await usersCollection.findOne(query);
-
-            // if(user?.userType !== 'admin'){
-            //     return res.status(403).send({message: 'forbidden access'})
-            // }
-
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true }
