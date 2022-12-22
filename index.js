@@ -12,12 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 
-
+// mongoDB
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.3q2ltkd.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-
+// JWT middleware
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -36,7 +36,7 @@ function verifyJWT(req, res, next) {
 
 }
 
-
+// crud operation function
 async function run() {
     try {
         const categoriesCollection = client.db('autoPlus').collection('categories');
@@ -59,6 +59,7 @@ async function run() {
             const test = await testimonialsCollection.find(query).toArray();
             res.send(test)
         })
+        // get individual product
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { categoryId: id }
@@ -231,11 +232,12 @@ run().catch(console.log)
 
 
 
-
+// default page
 app.get('/', (req, res) => {
     res.send('welcome to auto plus server')
 })
 
+// listen
 app.listen(port, () => {
     console.log(`server is running on port: ${port}`);
 })
